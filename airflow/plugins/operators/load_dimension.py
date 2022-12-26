@@ -3,6 +3,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.contrib.hooks.aws_hook import AwsHook
 from helpers import SqlQueries
+
 class LoadDimensionOperator(BaseOperator):
 
     ui_color = '#80BD9E'
@@ -11,7 +12,8 @@ class LoadDimensionOperator(BaseOperator):
     def __init__(self,
                  table = "",
                  redshift_conn_id="",
-                 create_query = "",
+                 insert_query = "",
+                 loading_type = None,
                  
                  # Define your operators params (with defaults) here
                  # Example:
@@ -21,7 +23,8 @@ class LoadDimensionOperator(BaseOperator):
         super(LoadDimensionOperator, self).__init__(*args, **kwargs)
         self.table = table
         self.redshift_conn_id = redshift_conn_id
-        self.create_query = create_query
+        self.insert_query = insert_query
+        self.loading_type = loading_type
         # Map params here
         # Example:
         # self.conn_id = conn_id
@@ -36,8 +39,20 @@ class LoadDimensionOperator(BaseOperator):
         self.log.info('Second establishing connection to redshift using connection established in the airflow UI')
         redshift_hook = PostgresHook("redshift")
         
-        self.log.info(f"Drop the {self.table} if existed")
-        redshift_hook.run(SqlQueries.drop_table_if_existed.format(self.table))
+        #self.log.info(f'trying to create {self.table} table in redshift out of staging tables')
+        #redshift_hook.run(self.create_query.format(self.table))
         
-        self.log.info(f'trying to create {self.table} table in redshift out of staging tables')
-        redshift_hook.run(self.create_query.format(self.table))
+        
+        if self.loading_type == "truncate":
+            self.log.info(f"truncate the table {self.table}")
+            redshift_hook.run(SqlQueries.truncate_table_if_existed.format(self.table))
+            self.log.info(f"loading the table {self.table}")
+            redshift_hook.run(self.insert_query.format(self.table))
+            
+        elif self.loading_type == "append":
+            self.log.info(f"appending the table {self.table}")
+            redshift_hook.run(self.insert_query.format(self.table))
+        elif self.loading_type == None:
+            raise Exception("Sorry, you should provide a loading_type eg. ('append' , 'truncate')")
+        else :
+            raise Exception("ERROR, load_type can't be anything except 'append' , 'trucate' please write them carefully ")

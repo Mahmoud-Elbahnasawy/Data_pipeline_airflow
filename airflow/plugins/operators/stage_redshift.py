@@ -3,7 +3,7 @@ from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from helpers import SqlQueries
 from airflow.contrib.hooks.aws_hook import AwsHook
-from operators.view_bucket_contents import *
+
 class StageToRedshiftOperator(BaseOperator):
     ui_color = '#358140'
     @apply_defaults
@@ -42,13 +42,13 @@ class StageToRedshiftOperator(BaseOperator):
         self.log.info('Second establishing connection to redshift using connection established in the airflow UI')
         redshift_hook = PostgresHook("redshift")
         
-        self.log.info(f"Drop the {self.table} if existed")
-        redshift_hook.run(SqlQueries.drop_table_if_existed.format(self.table))
+        #self.log.info(f"Drop the {self.table} if existed")
+        #redshift_hook.run(SqlQueries.drop_table_if_existed.format(self.table))
         
-        self.log.info(f'trying to create {self.table} table in redshift')
-        redshift_hook.run(self.create_query)
+        #self.log.info(f'trying to create {self.table} table in redshift')
+        #redshift_hook.run(self.create_query)
         
-        self.log.info(f'trying to populate {self.table} in from the s3 bucket')
+        self.log.info(f'trying to populate {self.table} in redshift from the s3 bucket')
         redshift_hook.run(SqlQueries.copy_sql.format(self.table , self.source_bucket, credentials.access_key, credentials.secret_key, self.json_path))
         self.log.info(f"{self.table} has been successfully populated from s3 bucket")
         

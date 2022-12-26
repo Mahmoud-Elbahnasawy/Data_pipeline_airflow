@@ -25,6 +25,8 @@ class DataQualityOperator(BaseOperator):
 
     def execute(self, context):
         self.log.info('\nDataQualityOperator not implemented yet')
+        """
+        # you can uncomment this lines from 29 to 46 so that to check every table individually
         self.log.info(f"\nWe are going to check for records in {self.table}")
         self.log.info('\n\nFirst establishing connection to s3 using connection established in the airflow UI')
         aws_hook = AwsHook("aws_credentials")
@@ -42,4 +44,7 @@ class DataQualityOperator(BaseOperator):
         if num_records < 1:
             raise ValueError(f"Data quality check failed. {self.table} contained 0 rows")
         self.log.info(f"Data quality on table {self.table} check passed with {records[0][0]} records")
+        """
+        
+        
         

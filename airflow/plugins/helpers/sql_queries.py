@@ -3,7 +3,7 @@ class SqlQueries:
 
 
 
-    songplay_table_insert = ("""CREATE TABLE {} AS
+    songplay_table_insert = ("""INSERT INTO "{}"
         SELECT
                 md5(events.sessionid || events.start_time) songplay_id,
                 events.start_time, 
@@ -22,26 +22,25 @@ class SqlQueries:
                 AND events.artist = songs.artist_name
                 AND events.length = songs.duration;
     """)
-#"""SELECT TIMESTAMP 'epoch' + ts/1000 * interval '1 second' AS start_time"""
-    user_table_insert = ("""CREATE TABLE "{}" AS
+
+    user_table_insert = ("""INSERT INTO "{}" 
         SELECT distinct userid, firstname, lastname, gender, level
         FROM staging_events
         WHERE page='NextSong'
     """)
 
-    song_table_insert = ("""CREATE TABLE "{}" AS
+    song_table_insert = ("""INSERT INTO "{}"
         SELECT distinct song_id, title, artist_id, year, duration
         FROM staging_songs
     """)
 
-    artist_table_insert = ("""CREATE TABLE "{}" AS
+    artist_table_insert = ("""INSERT INTO "{}"
         SELECT distinct artist_id, artist_name, artist_location, artist_latitude, artist_longitude
         FROM staging_songs
     """)
 
-    time_table_insert = ("""CREATE TABLE "{}" AS
-        SELECT start_time, extract(hour from start_time), extract(day from start_time), extract(week from start_time), 
-               extract(month from start_time), extract(year from start_time), extract(dayofweek from start_time)
+    time_table_insert = ("""INSERT INTO "{}"
+        SELECT start_time, extract(hour from start_time) AS hour, extract(day from start_time) AS day, extract(week from start_time) AS week , extract(month from start_time) AS month, extract(year from start_time) AS year, extract(dayofweek from start_time) AS dayofweek
         FROM songplays
     """)
     create_staging_songs=("""
@@ -83,9 +82,11 @@ class SqlQueries:
         userId          INTEGER
         );
         """)
-    drop_table_if_existed = ("""
-    DROP TABLE IF EXISTS "{}";""")
+    truncate_table_if_existed = ("""
+    TRUNCATE TABLE "{}";""")
     
+    drop_table_if_existed = ("""
+    drop TABLE IF EXISTS "{}";""")
     
     copy_sql = ("""
     COPY {}
@@ -131,9 +132,6 @@ class SqlQueries:
     quality_row_count_check = ("""
     SELECT COUNT(*) FROM {}; """)
     
-    quality_schema_check = ("""
-    select column_name, data_type, character_maximum_length, column_default, is_nullable
-    from INFORMATION_SCHEMA.COLUMNS where table_name = {};""")
     
     
 

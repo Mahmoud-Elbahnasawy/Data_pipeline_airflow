@@ -1,4 +1,4 @@
-CREATE TABLE public.artists (
+CREATE TABLE public.artist (
 	artistid varchar(256) NOT NULL,
 	name varchar(256),
 	location varchar(256),
@@ -19,7 +19,7 @@ CREATE TABLE public.songplays (
 	CONSTRAINT songplays_pkey PRIMARY KEY (playid)
 );
 
-CREATE TABLE public.songs (
+CREATE TABLE public.song (
 	songid varchar(256) NOT NULL,
 	title varchar(256),
 	artistid varchar(256),
@@ -50,7 +50,6 @@ CREATE TABLE public.staging_events (
 );
 
 
-
 CREATE TABLE public.staging_songs (
 	num_songs int4,
 	artist_id varchar(256),
@@ -75,7 +74,7 @@ CREATE TABLE public."time" (
 	CONSTRAINT time_pkey PRIMARY KEY (start_time)
 );
 
-CREATE TABLE public.users (
+CREATE TABLE public.user (
 	userid int4 NOT NULL,
 	first_name varchar(256),
 	last_name varchar(256),

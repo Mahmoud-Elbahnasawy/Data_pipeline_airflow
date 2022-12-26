@@ -12,7 +12,7 @@ class LoadFactOperator(BaseOperator):
     def __init__(self,
                  table = "",
                  redshift_conn_id="",
-                 create_query = "",
+                 insert_query = "",
                  
                  # Define your operators params (with defaults) here
                  # Example:
@@ -22,7 +22,7 @@ class LoadFactOperator(BaseOperator):
         super(LoadFactOperator, self).__init__(*args, **kwargs)
         self.table = table
         self.redshift_conn_id = redshift_conn_id
-        self.create_query = create_query
+        self.insert_query = insert_query
         # Map params here
         # Example:
         # self.conn_id = conn_id
@@ -36,14 +36,15 @@ class LoadFactOperator(BaseOperator):
         self.log.info('Second establishing connection to redshift using connection established in the airflow UI')
         redshift_hook = PostgresHook("redshift")
         
-        self.log.info(f"Drop the {self.table} if existed")
-        redshift_hook.run(SqlQueries.drop_table_if_existed.format(self.table))
+        #self.log.info(f"Drop the {self.table} if existed")
+        #redshift_hook.run(SqlQueries.drop_table_if_existed.format(self.table))
         
-        self.log.info(f'trying to create {self.table} table in redshift out of staging tables')
-        redshift_hook.run(self.create_query.format(self.table))
+        #self.log.info(f'trying to create {self.table} table in redshift out of staging tables')
+        #redshift_hook.run(self.create_query.format(self.table))
         
-        #self.log.info(f'trying to populate {self.table} in from the satging tables')
-        #redshift_hook.run(self.songplay_table_insert)
+        self.log.info(f'trying to populate {self.table} in from the satging tables')
+        self.log.info(f"here is the query after being parsed {self.insert_query.format(self.table)}")
+        redshift_hook.run(self.insert_query.format(self.table))
         
         self.log.info(f"{self.table} has been successfully populated satging tables")
         
